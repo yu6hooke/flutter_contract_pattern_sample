@@ -1,0 +1,14 @@
+{
+  "dart.flutterSdkPath": ".fvm/versions/3.16.9",
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.dart": "$(capture).freezed.dart, $(capture).g.dart"
+  }
+}
