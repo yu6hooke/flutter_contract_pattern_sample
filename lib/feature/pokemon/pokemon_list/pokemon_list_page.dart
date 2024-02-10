@@ -1,6 +1,7 @@
 import 'package:contract_pattern_sample/core/data/repository/pokemon/pokemon.dart';
 import 'package:contract_pattern_sample/core/ui/pokemon_theme.dart';
 import 'package:contract_pattern_sample/core/util/alert_state.dart';
+import 'package:contract_pattern_sample/feature/pokemon/pokemon_detail/pokemon_detail_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -45,7 +46,7 @@ class PokemonListPage extends HookConsumerWidget with AlertStateCompatible {
       none: () {},
       goDetail: (id) {
         ref.pokemonListNotifier.consume();
-        // TODO: 詳細画面に遷移
+        showPokemonDetailSheet(context, id: id);
       },
       showAlert: (state) {
         ref.pokemonListNotifier.consume();
