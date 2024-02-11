@@ -1,16 +1,34 @@
 # contract_pattern_sample
 
-A new Flutter project.
+Original Architecture Sample For Flutter
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```
+fvm install
+```
 
-A few resources to get you started if this is your first Flutter project:
+## VSCode
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+#### 実行 (launch.json)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+「Run And Debug」メニューから
+=> debug, profile, release
+
+#### 設定 (settings.json)
+
+自動生成ファイルは畳む
+
+```json
+{
+...
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.dart": "$(capture).freezed.dart, $(capture).g.dart"
+  }
+}
+```
+
+<img width="40%" src="https://github.com/yu6hooke/flutter_contract_pattern_sample/assets/17083696/7ee99ef2-e2ef-43f7-a9c0-acfcacdfe010" />
+
