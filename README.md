@@ -5,7 +5,7 @@ Original Architecture Sample For Flutter
 ## Getting Started
 
 ```
-fvm install
+fvm use
 ```
 
 ## VSCode
