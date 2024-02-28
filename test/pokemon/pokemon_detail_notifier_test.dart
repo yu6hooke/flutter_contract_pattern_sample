@@ -1,23 +1,22 @@
 import 'package:contract_pattern_sample/core/data/repository/pokemon/fake_pokemon_repository.dart';
-import 'package:contract_pattern_sample/core/data/repository/pokemon/pokemon_repository_impl.dart';
+import 'package:contract_pattern_sample/core/data/repository/pokemon/without_stream/fake_without_stream_pokemon_repository.dart';
+import 'package:contract_pattern_sample/core/data/repository/pokemon/without_stream/without_stream_pokemon_repository.dart';
 import 'package:contract_pattern_sample/feature/pokemon/pokemon_detail/pokemon_detail_contract.dart';
 import 'package:contract_pattern_sample/feature/pokemon/pokemon_detail/pokemon_detail_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:rxdart/rxdart.dart';
 
 void main() {
   group('PokemonDetailNotifier Test', () {
-    late BehaviorSubject<FakePokemonRepositoryState> fakePokemonState;
-    late FakePokemonRepository pokemonRepository;
+    late FakeWithoutStreamPokemonRepository pokemonRepository;
     late ProviderContainer container;
     final pokemon = FakePokemonRepositoryState.samplePokemonList.first;
 
     setUp(() {
-      fakePokemonState = BehaviorSubject.seeded(FakePokemonRepositoryState());
-      pokemonRepository = FakePokemonRepository.from(fakePokemonState);
+      pokemonRepository = FakeWithoutStreamPokemonRepository();
       container = ProviderContainer(overrides: [
-        pokemonRepositoryProvider.overrideWithValue(pokemonRepository),
+        withoutStreamPokemonRepositoryProvider
+            .overrideWith(() => pokemonRepository),
         pokemonDetailArgsProvider.overrideWith((ref) => pokemon.id),
       ]);
     });

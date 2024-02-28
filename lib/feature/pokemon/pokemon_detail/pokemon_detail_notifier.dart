@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:contract_pattern_sample/core/domain/pokemon/pokemon_usecase.dart';
+import 'package:contract_pattern_sample/core/domain/without_stream/without_stream_pokemon_usecase.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -25,19 +25,12 @@ extension PokemonDetailEx on WidgetRef {
 
 @riverpod
 class PokemonDetailNotifier extends _$PokemonDetailNotifier {
-  late final StreamSubscription _pokemonListSubscription;
-
-  PokemonUseCase get pokemonUseCase => ref.read(pokemonUseCaseProvider);
-
   @override
   PokemonDetailUiState build(int id) {
-    _pokemonListSubscription = pokemonUseCase.pokemonList.listen((list) {
-      state = state.copyWith(item: list.firstWhereOrNull((p) => p.id == id));
-    });
-    ref.onDispose(() {
-      _pokemonListSubscription.cancel();
-    });
-    return const PokemonDetailUiState(item: null);
+    final pokemon = ref.watch(withoutPokemonUseCaseProvider.select(
+      (value) => value.pokemonList.firstWhereOrNull((p) => p.id == id),
+    ));
+    return PokemonDetailUiState(item: pokemon);
   }
 
   void consume() {
