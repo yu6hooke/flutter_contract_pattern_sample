@@ -41,17 +41,17 @@ class PokemonDetailNotifier extends _$PokemonDetailNotifier {
   }
 
   void consume() {
-    _effectUpdater(const PokemonDetailEffect.none());
+    _updateEffect(const PokemonDetailEffect.none());
   }
 
   Future<void> send(PokemonDetailAction action) async {
     action.when(
       closeButtonClicked: () {
-        _effectUpdater(const PokemonDetailEffect.close());
+        _updateEffect(const PokemonDetailEffect.close());
       },
     );
   }
 
-  void _effectUpdater(PokemonDetailEffect effect) =>
-      ref.read(pokemonDetailEffectProvider.notifier).update((state) => effect);
+  _updateEffect(PokemonDetailEffect effect) =>
+      ref.read(pokemonDetailEffectProvider.notifier).update((_) => effect);
 }

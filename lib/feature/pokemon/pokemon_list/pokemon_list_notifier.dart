@@ -36,7 +36,7 @@ class PokemonListNotifier extends _$PokemonListNotifier {
   }
 
   void consume() {
-    _effectUpdater(const PokemonListEffect.none());
+    _updateEffect(const PokemonListEffect.none());
   }
 
   Future<void> send(PokemonListAction action) async {
@@ -47,18 +47,18 @@ class PokemonListNotifier extends _$PokemonListNotifier {
           await pokemonUseCase.fetch(page: 1);
         } on PokemonUseCaseException catch (e) {
           e.when(alert: (alertState) {
-            _effectUpdater(PokemonListEffect.showAlert(state: alertState));
+            _updateEffect(PokemonListEffect.showAlert(state: alertState));
           });
         } finally {
           state = state.copyWith(isLoading: false);
         }
       },
       itemClicked: (pokemon) {
-        _effectUpdater(PokemonListEffect.goDetail(id: pokemon.id));
+        _updateEffect(PokemonListEffect.goDetail(id: pokemon.id));
       },
     );
   }
 
-  void _effectUpdater(PokemonListEffect effect) =>
-      ref.read(pokemonListEffectProvider.notifier).update((state) => effect);
+  _updateEffect(PokemonListEffect effect) =>
+      ref.read(pokemonListEffectProvider.notifier).update((_) => effect);
 }
