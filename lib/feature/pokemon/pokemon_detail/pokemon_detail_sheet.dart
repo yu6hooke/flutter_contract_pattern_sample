@@ -7,6 +7,18 @@ import 'package:contract_pattern_sample/core/ui/pokemon_theme.dart';
 import 'pokemon_detail_contract.dart';
 import 'pokemon_detail_notifier.dart';
 
+extension _PokemonDetailEx on WidgetRef {
+  PokemonDetailNotifierProvider get notifierProvider {
+    final id = watch(pokemonDetailArgsProvider);
+    return pokemonDetailNotifierProvider(id);
+  }
+
+  PokemonDetailNotifier get notifier {
+    final id = read(pokemonDetailArgsProvider);
+    return read(pokemonDetailNotifierProvider(id).notifier);
+  }
+}
+
 void showPokemonDetailSheet(
   BuildContext context, {
   required int id,
@@ -16,9 +28,7 @@ void showPokemonDetailSheet(
     isScrollControlled: true,
     builder: (context) {
       return ProviderScope(
-        overrides: [
-          pokemonDetailArgsProvider.overrideWith((ref) => id),
-        ],
+        overrides: [pokemonDetailArgsProvider.overrideWith((ref) => id)],
         child: const PokemonDetailSheet(),
       );
     },
@@ -30,9 +40,8 @@ class PokemonDetailSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen(pokemonDetailEffectProvider, (_, effect) {
-      _handleEffect(context, ref, effect: effect);
-    });
+    ref.listen(pokemonDetailEffectProvider,
+        (_, effect) => _handleEffect(context, ref, effect: effect));
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
@@ -50,14 +59,12 @@ class PokemonDetailSheet extends HookConsumerWidget {
           automaticallyImplyLeading: false,
           actions: [
             CloseButton(
-              onPressed: () {
-                ref.pokemonDetailNotifier
-                    .send(const PokemonDetailAction.closeButtonClicked());
-              },
+              onPressed: () => ref.notifier
+                  .send(const PokemonDetailAction.closeButtonClicked()),
             ),
           ],
         ),
-        body: const PokemonDetailBody(),
+        body: const _PokemonDetailBody(),
       ),
     );
   }
@@ -67,24 +74,23 @@ class PokemonDetailSheet extends HookConsumerWidget {
     WidgetRef ref, {
     required PokemonDetailEffect effect,
   }) async {
-    effect.when(
-      none: () {},
-      close: () {
-        ref.pokemonDetailNotifier.consume();
+    switch (effect) {
+      case None():
+        break;
+
+      case Close():
+        ref.notifier.consume();
         Navigator.pop(context);
-      },
-    );
+    }
   }
 }
 
-class PokemonDetailBody extends HookConsumerWidget {
-  const PokemonDetailBody({super.key});
+class _PokemonDetailBody extends HookConsumerWidget {
+  const _PokemonDetailBody();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pokemonId = ref.watch(pokemonDetailArgsProvider);
-    final item = ref.watch(
-        pokemonDetailNotifierProvider(pokemonId).select((state) => state.item));
+    final item = ref.watch(ref.notifierProvider.select((state) => state.item));
 
     if (item == null) {
       return Center(

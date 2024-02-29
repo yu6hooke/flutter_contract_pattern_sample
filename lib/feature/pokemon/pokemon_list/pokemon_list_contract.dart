@@ -1,8 +1,12 @@
 import 'package:contract_pattern_sample/core/data/repository/pokemon/pokemon.dart';
 import 'package:contract_pattern_sample/core/util/alert_state.dart';
+import 'package:contract_pattern_sample/core/util/contract/base_contract.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'pokemon_list_contract.freezed.dart';
+
+typedef PokemonListContract
+    = BaseContract<PokemonListUiState, PokemonListAction, PokemonListEffect>;
 
 @freezed
 class PokemonListUiState with _$PokemonListUiState {
@@ -13,7 +17,7 @@ class PokemonListUiState with _$PokemonListUiState {
 }
 
 @freezed
-class PokemonListAction with _$PokemonListAction {
+sealed class PokemonListAction with _$PokemonListAction {
   const factory PokemonListAction.onAppear() = OnAppear;
   const factory PokemonListAction.itemClicked({
     required Pokemon pokemon,
@@ -21,7 +25,7 @@ class PokemonListAction with _$PokemonListAction {
 }
 
 @freezed
-class PokemonListEffect with _$PokemonListEffect {
+sealed class PokemonListEffect with _$PokemonListEffect {
   const factory PokemonListEffect.none() = None;
   const factory PokemonListEffect.goDetail({
     required int id,

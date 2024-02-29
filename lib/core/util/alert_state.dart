@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'alert_state.freezed.dart';
 
 @freezed
-class AlertState with _$AlertState {
+sealed class AlertState with _$AlertState {
   const factory AlertState.dialogState({
     String? title,
     required String message,
@@ -16,13 +16,13 @@ class AlertState with _$AlertState {
 
 mixin AlertStateCompatible {
   handleAlertState(BuildContext context, AlertState state) async {
-    state.when(
-      dialogState: (title, message, positive) {
+    switch (state) {
+      case DialogState(:final title, :final message, :final positive):
         _showDialog(context,
             title: title, message: message, positive: positive);
-      },
-      silent: () {},
-    );
+      case Silent():
+        break;
+    }
   }
 
   void _showDialog(

@@ -7,7 +7,7 @@ part of 'pokemon_list_notifier.dart';
 // **************************************************************************
 
 String _$pokemonListNotifierHash() =>
-    r'0fa2be7e06f910f81f026ea33626ddf3c6c43066';
+    r'e939f966cbf50bf7b4eb189912100522f126f51d';
 
 /// See also [PokemonListNotifier].
 @ProviderFor(PokemonListNotifier)

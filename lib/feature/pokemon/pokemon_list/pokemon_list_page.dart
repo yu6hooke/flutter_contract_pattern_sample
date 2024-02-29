@@ -9,21 +9,23 @@ import 'package:sliver_tools/sliver_tools.dart';
 
 import 'pokemon_list_contract.dart';
 import 'pokemon_list_notifier.dart';
+import 'ui_components/pokemon_list_item.dart';
+
+extension _PokemonListEx on WidgetRef {
+  PokemonListNotifier get notifier =>
+      read(pokemonListNotifierProvider.notifier);
+}
 
 class PokemonListPage extends HookConsumerWidget with AlertStateCompatible {
   const PokemonListPage({super.key});
 
-  static const routeName = 'base-state2';
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen(pokemonListEffectProvider, (_, effect) {
-      _handleEffect(context, ref, effect: effect);
-    });
+    ref.listen(pokemonListEffectProvider,
+        (_, effect) => _handleEffect(context, ref, effect: effect));
     useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.pokemonListNotifier.send(const PokemonListAction.onAppear());
-      });
+      WidgetsBinding.instance.addPostFrameCallback(
+          (_) => ref.notifier.send(const PokemonListAction.onAppear()));
       return null;
     }, []);
 
@@ -33,7 +35,7 @@ class PokemonListPage extends HookConsumerWidget with AlertStateCompatible {
         title: const Text('ポケモン図鑑'),
         backgroundColor: Theme.of(context).colorScheme.hydreigonBlue,
       ),
-      body: const PokemonListBody(),
+      body: const _PokemonListBody(),
     );
   }
 
@@ -42,22 +44,23 @@ class PokemonListPage extends HookConsumerWidget with AlertStateCompatible {
     WidgetRef ref, {
     required PokemonListEffect effect,
   }) async {
-    effect.when(
-      none: () {},
-      goDetail: (id) {
-        ref.pokemonListNotifier.consume();
-        showPokemonDetailSheet(context, id: id);
-      },
-      showAlert: (state) {
-        ref.pokemonListNotifier.consume();
-        handleAlertState(context, state);
-      },
-    );
+    switch (effect) {
+      case None():
+        break;
+
+      case GoDetail():
+        ref.notifier.consume();
+        showPokemonDetailSheet(context, id: effect.id);
+
+      case ShowAlert():
+        ref.notifier.consume();
+        handleAlertState(context, effect.state);
+    }
   }
 }
 
-class PokemonListBody extends HookConsumerWidget {
-  const PokemonListBody({super.key});
+class _PokemonListBody extends HookConsumerWidget {
+  const _PokemonListBody();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -68,14 +71,6 @@ class PokemonListBody extends HookConsumerWidget {
         child: CircularProgressIndicator(),
       );
     }
-
-    final pokemonItemList = uiState.pokemonList
-        .map((pokemon) => PokemonListItem(
-              onClicked: (pokemon) => ref.pokemonListNotifier
-                  .send(PokemonListAction.itemClicked(pokemon: pokemon)),
-              item: pokemon,
-            ))
-        .toList();
 
     return CustomScrollView(
       slivers: [
@@ -104,7 +99,8 @@ class PokemonListBody extends HookConsumerWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               sliver: SliverList(
-                delegate: SliverChildListDelegate(pokemonItemList),
+                delegate: SliverChildListDelegate(
+                    buildList(ref, pokemonList: uiState.pokemonList)),
               ),
             )
           ],
@@ -112,40 +108,17 @@ class PokemonListBody extends HookConsumerWidget {
       ],
     );
   }
-}
 
-class PokemonListItem extends StatelessWidget {
-  const PokemonListItem({
-    super.key,
-    required this.onClicked,
-    required this.item,
-  });
-
-  final void Function(Pokemon) onClicked;
-  final Pokemon item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: () => onClicked(item),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            children: [
-              // Name
-              Text(
-                '${item.id.toString().padLeft(4, '0')} - ${item.name}',
-                style: Theme.of(context).textTheme.text14.w600,
-              ),
-
-              // Thumbnail
-              const Spacer(),
-              Image.network(item.imageUrl, height: 50),
-            ],
-          ),
-        ),
-      ),
-    );
+  List<PokemonListItem> buildList(
+    WidgetRef ref, {
+    required List<Pokemon> pokemonList,
+  }) {
+    return pokemonList
+        .map((pokemon) => PokemonListItem(
+              onClicked: (pokemon) => ref.notifier
+                  .send(PokemonListAction.itemClicked(pokemon: pokemon)),
+              item: pokemon,
+            ))
+        .toList();
   }
 }

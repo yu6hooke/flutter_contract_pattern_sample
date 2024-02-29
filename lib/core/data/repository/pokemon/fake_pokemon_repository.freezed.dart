@@ -96,7 +96,9 @@ class __$$FakePokemonRepositoryStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$FakePokemonRepositoryStateImpl implements _FakePokemonRepositoryState {
+class _$FakePokemonRepositoryStateImpl
+    with DiagnosticableTreeMixin
+    implements _FakePokemonRepositoryState {
   _$FakePokemonRepositoryStateImpl({final List<Pokemon> pokemonList = const []})
       : _pokemonList = pokemonList;
 
@@ -110,8 +112,16 @@ class _$FakePokemonRepositoryStateImpl implements _FakePokemonRepositoryState {
   }
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'FakePokemonRepositoryState(pokemonList: $pokemonList)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FakePokemonRepositoryState'))
+      ..add(DiagnosticsProperty('pokemonList', pokemonList));
   }
 
   @override

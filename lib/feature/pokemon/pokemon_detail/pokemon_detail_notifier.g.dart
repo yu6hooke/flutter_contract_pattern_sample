@@ -7,7 +7,7 @@ part of 'pokemon_detail_notifier.dart';
 // **************************************************************************
 
 String _$pokemonDetailNotifierHash() =>
-    r'2f072cf026befeb3430d3919b2eb64e84a4be4cb';
+    r'aaed6f593f9159fd32a56ab5cb0a28af798ef68a';
 
 /// Copied from Dart SDK
 class _SystemHash {

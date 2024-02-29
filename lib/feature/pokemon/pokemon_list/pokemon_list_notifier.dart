@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:contract_pattern_sample/core/domain/pokemon/pokemon_usecase.dart';
+import 'package:contract_pattern_sample/core/domain/pokemon/pokemon_usecase.dart'
+    as pokemon_usecase;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -8,57 +9,49 @@ import 'pokemon_list_contract.dart';
 
 part 'pokemon_list_notifier.g.dart';
 
-final pokemonListEffectProvider = StateProvider<PokemonListEffect>(
-  (ref) => const PokemonListEffect.none(),
-);
-
-extension PokemonListEx on WidgetRef {
-  PokemonListNotifier get pokemonListNotifier =>
-      read(pokemonListNotifierProvider.notifier);
-}
+final pokemonListEffectProvider =
+    StateProvider((ref) => const PokemonListEffect.none());
 
 @riverpod
-class PokemonListNotifier extends _$PokemonListNotifier {
+class PokemonListNotifier extends _$PokemonListNotifier
+    implements PokemonListContract {
   late final StreamSubscription _pokemonListSubscription;
 
-  PokemonUseCase get pokemonUseCase => ref.read(pokemonUseCaseProvider);
+  pokemon_usecase.PokemonUseCase get _pokemonUseCase =>
+      ref.read(pokemon_usecase.pokemonUseCaseProvider);
 
   @override
   PokemonListUiState build() {
-    _pokemonListSubscription = pokemonUseCase.pokemonList.listen((list) {
-      state = state.copyWith(pokemonList: list);
-    });
-    ref.onDispose(() {
-      _pokemonListSubscription.cancel();
-    });
+    _pokemonListSubscription = _pokemonUseCase.pokemonList
+        .listen((list) => state = state.copyWith(pokemonList: list));
+    ref.onDispose(_pokemonListSubscription.cancel);
 
     return const PokemonListUiState();
   }
 
+  @override
   void consume() {
-    _effectUpdater(const PokemonListEffect.none());
+    _updateEffect(const PokemonListEffect.none());
   }
 
+  @override
   Future<void> send(PokemonListAction action) async {
-    action.when(
-      onAppear: () async {
+    switch (action) {
+      case OnAppear():
         try {
           state = state.copyWith(isLoading: true);
-          await pokemonUseCase.fetch(page: 1);
-        } on PokemonUseCaseException catch (e) {
-          e.when(alert: (alertState) {
-            _effectUpdater(PokemonListEffect.showAlert(state: alertState));
-          });
+          await _pokemonUseCase.fetch(page: 1);
+        } on pokemon_usecase.Alert catch (e) {
+          _updateEffect(PokemonListEffect.showAlert(state: e.state));
         } finally {
           state = state.copyWith(isLoading: false);
         }
-      },
-      itemClicked: (pokemon) {
-        _effectUpdater(PokemonListEffect.goDetail(id: pokemon.id));
-      },
-    );
+
+      case ItemClicked(:final pokemon):
+        _updateEffect(PokemonListEffect.goDetail(id: pokemon.id));
+    }
   }
 
-  void _effectUpdater(PokemonListEffect effect) =>
+  _updateEffect(PokemonListEffect effect) =>
       ref.read(pokemonListEffectProvider.notifier).update((state) => effect);
 }
